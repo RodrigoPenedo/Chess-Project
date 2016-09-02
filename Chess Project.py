@@ -1,4 +1,5 @@
-
+from ErrorHandler import whole_number
+from Stack import Stack
 
 class Board(object):
     # The chess board is represented as a 8x8 2D array
@@ -24,7 +25,51 @@ class Board(object):
             self.__board[7][6] = Knight("w")
             self.__board[0][7] = Rook("b")
             self.__board[7][7] = Rook("w")
-            print(self.__board)
+        print(self.__board)
+        move_piece()
+        
+
+def move_piece():
+    accepted1 = ["a","b","c","d","e","f","g","h"]
+    accepted2 = ["1","2","3","4","5","6","7","8"]
+
+    move_from = " "
+    move_to = " "
+    
+    while (move_from[0] not in accepted1) or (move_from[1] not in accepted2):
+        move_from = str(input("Please enter the piece you wish to move: "))
+        
+        if len(move_from) == 2: #length must be 2, otherwise code breaks
+            if move_from[0] in accepted1 or move_from[1] in accepted2: #check for format
+                print("") #Accepted
+            else:
+                print("Invalid")
+        else:
+            print("Invalid")
+
+
+    while move_to[0] not in accepted1 or move_to[1] not in accepted2:
+        move_to = str(input("please enter the desired destination of the piece: "))
+
+        if len(move_to) == 2: #length must be 2, otherwise code breaks
+            if move_to[0] in accepted1 or move_to[1] in accepted2: #check for format
+                print("") #Accepted
+            else:
+                print("Invalid")
+        else:
+            print("Invalid")
+            
+    print("Moving from",move_from,"to",move_to)
+
+    movefrom = str(accepted1.index(move_from[0])) + str(int(move_from[1])-1)
+    moveto = str(accepted1.index(move_to[0])) + str(int(move_to[1])-1)
+    print("Moving from",movefrom,"to",moveto)
+
+    row = board[movefrom[0]]
+    print(row[movefrom[1]])
+    
+
+
 
 class Piece(object):
     # A generalised piece object, chess pieces will inherit from this class
@@ -83,3 +128,4 @@ class Pawn(Piece):
         return str(self._colour + "p")
     
 board = Board()
+
