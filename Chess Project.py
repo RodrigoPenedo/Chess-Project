@@ -1,6 +1,3 @@
-from ErrorHandler import whole_number
-from Stack import Stack
-
 class Board(object):
     # The chess board is represented as a 8x8 2D array
     def __init__(self):
@@ -67,10 +64,8 @@ def move_piece():
 
     row = board[movefrom[0]]
     print(row[movefrom[1]])
+
     
-
-
-
 class Piece(object):
     # A generalised piece object, chess pieces will inherit from this class
     # and override its procedures
