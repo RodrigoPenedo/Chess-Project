@@ -106,12 +106,6 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0]+i, from_coords[1]])
 
-                else:
-                    if board[from_coords[0]+i][from_coords[1]].colour is not self._colour:
-                        self._legal_moves.append([from_coords[0]+i, from_coords[1]])
-                        break
-                    
-        for i in range(1,8):
             #Make sure it stays within range of the board
             if 0 <= from_coords[1]+i <= 7:
                 #To go Up
@@ -119,12 +113,6 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0], from_coords[1]+i])
 
-                else:
-                    if board[from_coords[0]][from_coords[1]+i].colour is not self._colour:
-                        self._legal_moves.append([from_coords[0], from_coords[1]+i])
-                        break
-                    
-        for i in range(1,8):
             #Make sure it stays within range of the board
             if 0 <= from_coords[0]-i <= 7:
                 #To go Right
@@ -132,12 +120,6 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0]-i, from_coords[1]])
 
-                else:
-                    if board[from_coords[0]-i][from_coords[1]].colour is not self._colour:
-                        self._legal_moves.append([from_coords[0]-i, from_coords[1]])
-                        break
-
-        for i in range(1,8):
             #Make sure it stays within range of the board
             if 0 <= from_coords[1]-i <= 7:
                 #To go Left
@@ -145,12 +127,7 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0], from_coords[1]-i])
 
-                else:
-                    if board[from_coords[0]][from_coords[1]-i].colour is not self._colour:
-                        self._legal_moves.append([from_coords[0], from_coords[1]-i])
-                        break
-
-        print(self._legal_moves) #Useful for debugging
+        #print(self._legal_moves) #Useful for debugging
 
     
     def __repr__(self):
