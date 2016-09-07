@@ -106,10 +106,14 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0]+i, from_coords[1]])
 
+                #To when there is a piece
                 else:
+                    #Check if the color of the piece is not the same, so it can be taken
                     if board[from_coords[0]+i][from_coords[1]].colour is not self._colour:
+                        # If so, add the move to the Rook's legal moves
                         self._legal_moves.append([from_coords[0]+i, from_coords[1]])
-                        break
+                    #Stop after finding any piece
+                    break
                     
         for i in range(1,8):
             #Make sure it stays within range of the board
@@ -119,10 +123,14 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0], from_coords[1]+i])
 
+                #To when there is a piece
                 else:
+                    #Check if the color of the piece is not the same, so it can be taken
                     if board[from_coords[0]][from_coords[1]+i].colour is not self._colour:
+                        # If so, add the move to the Rook's legal moves
                         self._legal_moves.append([from_coords[0], from_coords[1]+i])
-                        break
+                    #Stop after finding any piece
+                    break
                     
         for i in range(1,8):
             #Make sure it stays within range of the board
@@ -132,10 +140,14 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0]-i, from_coords[1]])
 
+                #To when there is a piece
                 else:
+                    #Check if the color of the piece is not the same, so it can be taken
                     if board[from_coords[0]-i][from_coords[1]].colour is not self._colour:
+                        # If so, add the move to the Rook's legal moves
                         self._legal_moves.append([from_coords[0]-i, from_coords[1]])
-                        break
+                    #Stop after finding any piece
+                    break
 
         for i in range(1,8):
             #Make sure it stays within range of the board
@@ -145,10 +157,15 @@ class Rook(Piece):
                     # If so, add the move to the Rook's legal moves
                     self._legal_moves.append([from_coords[0], from_coords[1]-i])
 
+                #To when there is a piece
                 else:
+                    #Check if the color of the piece is not the same, so it can be taken
                     if board[from_coords[0]][from_coords[1]-i].colour is not self._colour:
+                        # If so, add the move to the Rook's legal moves
                         self._legal_moves.append([from_coords[0], from_coords[1]-i])
-                        break
+                    #Stop after finding any piece
+                    break
+                    
 
         print(self._legal_moves) #Useful for debugging
 
