@@ -44,7 +44,6 @@ wQ = PhotoImage(file="Pieces/wQ.gif")
 wR = PhotoImage(file="Pieces/wR.gif")
 
 Empty = PhotoImage(file="Pieces/Empty.gif")
-meme = PhotoImage(file="Pieces/meme.gif")
 
 for x in range(0,8):
     a = True
@@ -103,34 +102,15 @@ for y in range(0,8):
   Grid.rowconfigure(frame, y, weight=1, minsize=60)
 
 
-def mouse(event):
-    grid_info = event.widget.grid_info()
-    x = grid_info["row"]
-    y = grid_info["column"]
-    print(y,x)
-
-    btn = Buttons[y][x]
-    btn.configure(image = Empty)
-    
-    print("hello")
-
-
-def secondmouse (event):
-    global selected, square_selected
+def click (event):
+    global selected, square_selected, piece_selected
     
     grid_info = event.widget.grid_info()
     z = grid_info["column"]
     w = grid_info["row"]
     coords = z,w
-    
-    if selected == False:
-        btn = Buttons[z][w]
-        btn.configure(bg = "orange")
-        selected = True
-        square_selected = z,w
 
-        
-    elif selected == True and (square_selected == coords):
+    if selected == True and (square_selected == coords):
         btn = Buttons[z][w]
         colour = Colours[z][w]
         if colour == "white":
@@ -140,19 +120,94 @@ def secondmouse (event):
             btn.configure(bg = "black")
         selected = False
         square_selected = ""
+        piece_selected = ""
+    
+    elif selected == False:
+        if board.board[w][z] is not None:
+            btn = Buttons[z][w]
+            btn.configure(bg = "orange")
+            selected = True
+            square_selected = z,w
+            piece_selected = board.board[w][z]
 
 
+    elif selected == True:
+        board.move([square_selected[1],square_selected[0]],[coords[1],coords[0]])
+        btn = Buttons[coords[0]][coords[1]]
+
+        if piece_selected == board.board[coords[1]][coords[0]]:
+            
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "bB":
+                btn.configure(image = bB)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "bK":
+                btn.configure(image = bK)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "bN":
+                btn.configure(image = bN)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "bp":
+                btn.configure(image = bp)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "bQ":
+                btn.configure(image = bQ)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "bR":
+                btn.configure(image = bR)
+                
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "wB":
+                btn.configure(image = wB)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "wK":
+                btn.configure(image = wK)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "wN":
+                btn.configure(image = wN)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "wp":
+                btn.configure(image = wp)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "wQ":
+                btn.configure(image = wQ)
+            if str(board.board[coords[1]][coords[0]]).replace("  ","") == "wR":
+                btn.configure(image = wR)
+
+            btn = Buttons[square_selected[0]][square_selected[1]]
+            colour = Colours[square_selected[0]][square_selected[1]]
+
+            if colour == "white":
+                btn.configure(bg = "white")
+                
+            elif colour == "black":
+                btn.configure(bg = "black")
+                
+            btn.configure(image = Empty)
+            selected = False
+            square_selected = ""
+
+
+    if selected == True:
+        from_coords = [square_selected[1],square_selected[0]]
+        possiblemoves = board.legalmoves(from_coords,board)
+        print(possiblemoves)
+        
+        for i in range(0,len(possiblemoves)):
+            moves = possiblemoves[i]
+            btn = Buttons[moves[1]][moves[0]]
+            btn.configure(bg = "orange")
+            
+
+    elif selected == False:
+        for i in range(0,8):
+            for j in range(0,8):
+                btn = Buttons[i][j]
+                colour = Colours[i][j]
+
+                if colour == "white":
+                    btn.configure(bg = "white")
+                    
+                if colour == "black":
+                    btn.configure(bg = "black")
+                    
+                    
+    
     print(w,z)
 
-def movement(event,y,x,w,z):
-    board.move([y,x],[w,z])
-    grid_info = event.widget.grid_info()
-    btn = Buttons[y][x]
-    btn.configure(image = Empty)
-    btn = Buttons[y][x]
-    btn.configure(image = str(board.board[y][x]).replace("  ",""))
 
-root.bind("<Button-1>", mouse)
-root.bind("<Button-3>", secondmouse)
+    
+
+root.bind("<Button-1>", click)
+root.bind("<Button-3>")
 
 root.mainloop()

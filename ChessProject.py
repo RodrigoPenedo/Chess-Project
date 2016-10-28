@@ -33,7 +33,12 @@ class Board(object):
                 self.__board[to_coords[0]][to_coords[1]] = self.__board[from_coords[0]][from_coords[1]]
                 self.__board[from_coords[0]][from_coords[1]] = None
 
-    def board(self):
+    def legalmoves(self,from_coords,board):
+        print(from_coords)
+        piece = self.__board[from_coords[0]][from_coords[1]]
+        return piece.get_legal_moves(from_coords,self.__board)
+
+    def boardshow(self):
         for row in self.__board:
             print(row)
 
@@ -136,7 +141,7 @@ class King(Piece):
                                 #So that the king doesn't move into a Check Position
                                 self.legal_moves.remove(move)
 
-
+        return self._legal_moves
 
     def __repr__(self):
         return str(self._colour + "K  ")
@@ -291,7 +296,8 @@ class Queen(Piece):
                         self._legal_moves.append([from_coords[0]+i, from_coords[1]-i])
                     #Stop after finding any piece
                     break
-
+                
+        return self._legal_moves
 
     def __repr__(self):
         return str(self._colour + "Q  ")
@@ -374,7 +380,8 @@ class Rook(Piece):
                         self._legal_moves.append([from_coords[0], from_coords[1]-i])
                     #Stop after finding any piece
                     break
-
+                
+        return self._legal_moves
         
     def __repr__(self):
         return str(self._colour + "R  ")
@@ -461,6 +468,7 @@ class Bishop(Piece):
                     #Stop after finding any piece
                     break
                 
+        return self._legal_moves
 
     def __repr__(self):
         return str(self._colour + "B  ")
@@ -479,60 +487,61 @@ class Knight(Piece):
             for j in range(1,3):
 
                 #Limit the knight to only doing L shaped moves
-                if i == 1 and j == 1 or i == 2 and j == 2:
-                    break
-
-
-                #Check two squares downwards vertically to the right, while within range
-                if 0 <= from_coords[0]+i <= 7 and 0 <= from_coords[1]+j <= 7:
-                    #Check if empty
-                    if board[from_coords[0]+i][from_coords[1]+j] is None:
-                        #If so add new move to it's possible moves
-                        self._legal_moves.append([from_coords[0]+i, from_coords[1]+j])
-                    else:
-                        #When not empty check for the colour of the piece
-                        if board[from_coords[0]+i][from_coords[1]+j].colour is not self._colour:
+                if i != j:
+                        
+                    #Check two squares downwards vertically to the right, while within range
+                    if 0 <= from_coords[0]+i <= 7 and 0 <= from_coords[1]+j <= 7:
+                        #Check if empty
+                        if board[from_coords[0]+i][from_coords[1]+j] is None:
                             #If so add new move to it's possible moves
                             self._legal_moves.append([from_coords[0]+i, from_coords[1]+j])
+                        else:
+                            #When not empty check for the colour of the piece
+                            if board[from_coords[0]+i][from_coords[1]+j].colour is not self._colour:
+                                #If so add new move to it's possible moves
+                                self._legal_moves.append([from_coords[0]+i, from_coords[1]+j])
 
-                #Check two squares downwards vertically to the left, while within range
-                if 0 <= from_coords[0]-i <= 7 and 0 <= from_coords[1]+j <= 7:
-                    #Check if empty
-                    if board[from_coords[0]-i][from_coords[1]+j] is None:
-                        #If so add new move to it's possible moves
-                        self._legal_moves.append([from_coords[0]-i, from_coords[1]+j])
-                    else:
-                        #When not empty check for the colour of the piece
-                        if board[from_coords[0]-i][from_coords[1]+j].colour is not self._colour:
+                    #Check two squares downwards vertically to the left, while within range
+                    if 0 <= from_coords[0]-i <= 7 and 0 <= from_coords[1]+j <= 7:
+                        #Check if empty
+                        if board[from_coords[0]-i][from_coords[1]+j] is None:
                             #If so add new move to it's possible moves
                             self._legal_moves.append([from_coords[0]-i, from_coords[1]+j])
+                        else:
+                            #When not empty check for the colour of the piece
+                            if board[from_coords[0]-i][from_coords[1]+j].colour is not self._colour:
+                                #If so add new move to it's possible moves
+                                self._legal_moves.append([from_coords[0]-i, from_coords[1]+j])
 
-                #Check two squares upwards vertically to the left, while within range
-                if 0 <= from_coords[0]+i <= 7 and 0 <= from_coords[1]-j <= 7:
-                    #Check if empty
-                    if board[from_coords[0]+i][from_coords[1]-j] is None:
-                        #If so add new move to it's possible moves
-                        self._legal_moves.append([from_coords[0]+i, from_coords[1]-j])
-                        
-                    else:
-                        #When not empty check for the colour of the piece
-                        if board[from_coords[0]+i][from_coords[1]-j].colour is not self._colour:
+                    #Check two squares upwards vertically to the left, while within range
+                    if 0 <= from_coords[0]+i <= 7 and 0 <= from_coords[1]-j <= 7:
+                        #Check if empty
+                        if board[from_coords[0]+i][from_coords[1]-j] is None:
                             #If so add new move to it's possible moves
                             self._legal_moves.append([from_coords[0]+i, from_coords[1]-j])
+                            
+                        else:
+                            #When not empty check for the colour of the piece
+                            if board[from_coords[0]+i][from_coords[1]-j].colour is not self._colour:
+                                #If so add new move to it's possible moves
+                                self._legal_moves.append([from_coords[0]+i, from_coords[1]-j])
 
-                #Check two squares upwards vertically to the right, while within range
-                if 0 <= from_coords[0]-i <= 7 and 0 <= from_coords[1]-j <= 7:
-                    #Check if empty
-                    if board[from_coords[0]-i][from_coords[1]-j] is None:
-                        #If so add new move to it's possible moves
-                        self._legal_moves.append([from_coords[0]-i, from_coords[1]-j])
-                    else:
-                        #When not empty check for the colour of the piece
-                        if board[from_coords[0]-i][from_coords[1]-j].colour is not self._colour:
+                    #Check two squares upwards vertically to the right, while within range
+                    if 0 <= from_coords[0]-i <= 7 and 0 <= from_coords[1]-j <= 7:
+                        #Check if empty
+                        if board[from_coords[0]-i][from_coords[1]-j] is None:
                             #If so add new move to it's possible moves
                             self._legal_moves.append([from_coords[0]-i, from_coords[1]-j])
-
-
+                        else:
+                            #When not empty check for the colour of the piece
+                            if board[from_coords[0]-i][from_coords[1]-j].colour is not self._colour:
+                                #If so add new move to it's possible moves
+                                self._legal_moves.append([from_coords[0]-i, from_coords[1]-j])
+                else:
+                    pass
+                
+        return self._legal_moves
+    
     def __repr__(self):
         return str(self._colour + "N  ")
 
@@ -611,28 +620,7 @@ class Pawn(Piece):
                         # If so, add the capture into legal moves
                         self._legal_moves.append([from_coords[0]+1, from_coords[1]+1])
 
+        return self._legal_moves
     
     def __repr__(self):
         return str(self._colour + "p  ")
-
-
-#delete me, just for debugging
-def a():
-    global start
-    start = time.time()
-    global board
-    board = Board()
-def b():
-    board.board()
-
-def m():
-    z = int(input())
-    x = int(input())
-    c = int(input())
-    v = int(input())
-    board.move([z,x],[c,v])
-    
-def timetaken():
-    end = time.time()
-    print(end - start)
-#delete me
