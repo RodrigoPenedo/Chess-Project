@@ -33,8 +33,41 @@ class Board(object):
                 self.__board[to_coords[0]][to_coords[1]] = self.__board[from_coords[0]][from_coords[1]]
                 self.__board[from_coords[0]][from_coords[1]] = None
 
+    def Save(self,board):
+        save = ""
+        for i in range(8):
+            for j in range(8):
+                save += str(self.__board[i][j])
+            save += "\n"
+
+        save = save.replace("  ","-- ")
+        save = save.replace("None","---- ")
+
+        name = "Save-File-" + str(time.strftime("%d-%b-%Y-%H-%M-%S"))
+        save_file = open(name + ".txt", mode="w+", encoding="utf-8")
+        save_file.write(save)
+
+    def Load(self,board,filelocation):
+        board_loaded = []
+        Load_file = open(filelocation,"r", encoding="utf-8")
+        Load = Load_file.read()
+        Load = Load.replace("\n","")
+        Load = Load.replace("----","None")
+        Load = Load.replace("  ","--")
+        Load = Load.replace(" ","")
+        Load = Load.replace("--", "  ")
+        Load = [Load[i:i + 32] for i in range(0, len(Load), 32)]
+
+        for i in range(0,8):
+            board_loaded.append([])
+            board_loaded[i] = [Load[i][j:j + 4] for j in range(0, len(Load[i]), 4)]
+
+        self.__board = board_loaded
+        return board_loaded
+
+
     def legalmoves(self,from_coords,board):
-        print(from_coords)
+        #print(from_coords)
         piece = self.__board[from_coords[0]][from_coords[1]]
         return piece.get_legal_moves(from_coords,self.__board)
 
@@ -73,7 +106,6 @@ class Piece(object):
             return True
         else:
             return False
-            print("Invalid Move")
 
     @property
     def colour(self):
@@ -576,16 +608,16 @@ class Pawn(Piece):
                     # Check if the colour of the piece is black
                     if board[from_coords[0]-1][from_coords[1]-1].colour == "b":
                         # If so, add the capture into legal moves
-                        self._legal_moves.append([[from_coords[0]-1], from_coords[1]-1])
+                        self._legal_moves.append([from_coords[0]-1, from_coords[1]-1])
 
             # Check such that all but the right-most pawn can legally make this move
             if from_coords[1] != 7:
                 # Check if the diagonal-right square is occupied
-                if board[from_coords[0]-1][from_coords[1]-1] is not None:
+                if board[from_coords[0]-1][from_coords[1]+1] is not None:
                     # Check if the colour of the piece is black
-                    if board[from_coords[0]-1][from_coords[1]-1].colour == "b":
+                    if board[from_coords[0]-1][from_coords[1]+1].colour == "b":
                         # If so, add the capture into legal moves
-                        self._legal_moves.append([from_coords[0]-1, from_coords[1]-1])
+                        self._legal_moves.append([from_coords[0]-1, from_coords[1]+1])
 
 
         # When the Pawn is Black
