@@ -37,6 +37,11 @@ class Board(object):
         for row in self.__board:
             print(row)
 
+    @property
+    def board(self):
+        return self.__board
+
+
 
 class Piece(object):
     # A generalised piece object, chess pieces will inherit from this class
@@ -610,8 +615,6 @@ class Pawn(Piece):
     def __repr__(self):
         return str(self._colour + "p  ")
 
-
-print("version 2.1 - King update")
 
 #delete me, just for debugging
 def a():
