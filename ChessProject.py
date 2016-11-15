@@ -25,6 +25,7 @@ class Board(object):
         self.__board[0][7] = Rook("b")
         self.__board[7][7] = Rook("w")
 
+
     def move(self, from_coords, to_coords):
         piece = self.__board[from_coords[0]][from_coords[1]]
         if piece is not None:  # Check if piece exists
@@ -32,6 +33,11 @@ class Board(object):
                 # Move the piece and then remove it from its original position
                 self.__board[to_coords[0]][to_coords[1]] = self.__board[from_coords[0]][from_coords[1]]
                 self.__board[from_coords[0]][from_coords[1]] = None
+
+    def UndoMove(self, to_coords, from_coords):
+        self.__board[to_coords[0]][to_coords[1]] = self.__board[from_coords[0]][from_coords[1]]
+        self.__board[from_coords[0]][from_coords[1]] = None
+        
 
     def Save(self,board):
         save = ""
