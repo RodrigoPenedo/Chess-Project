@@ -3,6 +3,31 @@ import time
 class Board(object):
     # The chess board is represented as a 8x8 2D array
     def __init__(self):
+        self.__board = [[None] * 8 for i in range(8)]
+
+        for i in range(0, 8):
+            self.__board[1][i] = Pawn("b")
+            self.__board[6][i] = Pawn("w")
+        self.__board[0][0] = Rook("b")
+        self.__board[7][0] = Rook("w")
+        self.__board[0][1] = Knight("b")
+        self.__board[7][1] = Knight("w")
+        self.__board[0][2] = Bishop("b")
+        self.__board[7][2] = Bishop("w")
+        self.__board[0][3] = Queen("b")
+        self.__board[7][3] = Queen("w")
+        self.__board[0][4] = King("b")
+        self.__board[7][4] = King("w")
+        self.__board[0][5] = Bishop("b")
+        self.__board[7][5] = Bishop("w")
+        self.__board[0][6] = Knight("b")
+        self.__board[7][6] = Knight("w")
+        self.__board[0][7] = Rook("b")
+        self.__board[7][7] = Rook("w")
+
+        self.piecetaken = ""
+
+    def InitialPieceSetup(self):
         # Create the board and put the pieces in their initial positions
         self.__board = [[None] * 8 for i in range(8)]
         for i in range(0, 8):
@@ -25,14 +50,18 @@ class Board(object):
         self.__board[0][7] = Rook("b")
         self.__board[7][7] = Rook("w")
 
+        self.piecetaken = ""
 
     def move(self, from_coords, to_coords):
         piece = self.__board[from_coords[0]][from_coords[1]]
         if piece is not None:  # Check if piece exists
             if piece.check_legal_move(from_coords, self.__board, to_coords):  #Check if the move is legal
+                if self.__board[to_coords[0]][to_coords[1]] is not None:
+                    self.piecetaken = str(self.__board[to_coords[0]][to_coords[1]])
                 # Move the piece and then remove it from its original position
                 self.__board[to_coords[0]][to_coords[1]] = self.__board[from_coords[0]][from_coords[1]]
                 self.__board[from_coords[0]][from_coords[1]] = None
+
 
     def UndoMove(self, to_coords, from_coords):
         self.__board[to_coords[0]][to_coords[1]] = self.__board[from_coords[0]][from_coords[1]]
@@ -70,16 +99,110 @@ class Board(object):
 
         self.__board = board_loaded
         return board_loaded
+        
+    def Turns(self):
+        for x in range(0,8):
+            for y in range(0,8):
+                piece = (str(self.__board[x][y])).replace(" ","")
+                if piece == "wK" or piece == "bK":
+                    if (str(self.__board[x][y])).replace(" ","") == "wK":
+                        whiteKing = self.__board[x][y]
+                        WK_location = x,y
+                        
+                    if (str(self.__board[x][y])).replace(" ","") == "bK":
+                        blackKing = self.__board[x][y]
+                        BK_location = x,y
+
+        self.turn = "W"
+        self.turn_count = 1
+
+        WK_Check = False
+        for row in range(0,8):
+            for column in range(0,8):
+                from_coords = [row,column]
+                piece = self.__board[row][column]
+                if piece is not None: 
+                    if type(piece) is not King and piece.colour is not "w":
+                        piece.get_legal_moves(from_coords, self.__board)
+                        for move in piece.legal_moves:
+                            if move == WK_location:
+                                WK_Check = True
+
+        BK_Check = False
+        for row in range(0,8):
+            for column in range(0,8):
+                from_coords = [row,column]
+                piece = self.__board[row][column]
+                if piece is not None: 
+                    if type(piece) is not King and piece.colour is not "b":
+                        piece.get_legal_moves(from_coords, self.__board)
+                        for move in piece.legal_moves:
+                            if move == BK_location:
+                                BK_Check = True
 
 
+        whiteKing = self.__board[WK_location[0]][WK_location[1]]
+        blackKing = self.__board[BK_location[0]][BK_location[1]]
+        
+        white_conditions = ((whiteKing.legal_moves != None) and (WK_Check != True))
+        black_conditions = ((blackKing.legal_moves != None) and (BK_Check != True))
+
+        while (white_conditions or black_conditions) == True:
+            self.turn_over == False
+            
+            while self.turn_over != True:
+                if self.turn_over == True:
+                    if self.turn == "W": #White Pieces
+                        print("white to black")
+                        self.turn = "B"
+
+                    if self.turn == "B": #Black Pieces
+                        print("black to white")
+                        self.turn = "W"
+
+                print(self.turn_count)
+                self.turn_count += 1
+
+                for x in range(8):    #Update the King's location
+                    for y in range(8):
+                        if self.__board[x][y] is King:
+                            if self.__board[x][y].colour == "w":
+                                self.whiteKing = self.__board[x][y]
+                            if self.__board[x][y].colour == "b":
+                                self.blackKing = self.__board[x][y]
+
+        if white_conditions == False:
+            print("Black Wins")
+        if black_conditions == False:
+            print("White Wins")
+                                
+    
     def legalmoves(self,from_coords,board):
         #print(from_coords)
         piece = self.__board[from_coords[0]][from_coords[1]]
         return piece.get_legal_moves(from_coords,self.__board)
 
+    
+    
+    def turn_over():
+        self.turn_over = True
+    
     def boardshow(self):
         for row in self.__board:
             print(row)
+
+    def taken(self):
+        return self.piecetaken
+    
+    def turn(self):
+        return self.turn
+    
+    def turn_count(self):
+        return self.turn_count
+    
+    def turn_reset(self):
+        self.turn_count = 0
+        self.turn = ""
 
     @property
     def board(self):
