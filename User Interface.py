@@ -185,6 +185,7 @@ def UndoMove(event):
 
             board.UndoMove(to_coords, from_coords)
             UpdateBoardPieces(piece_selected, coords, square_selected, True)
+            board.turn_undo()
             PiecesImagesUpdate()
 
 
@@ -462,13 +463,14 @@ def click(event):
     except KeyError:
         Playing = False
 
+    a = """
     win = None
-    board.check_mate()
+    win = board.check_mate()
     if win != None:
         if win == "B":
             write("Black Wins")
         if win == "W":
-            write("White Wins")
+            write("White Wins")"""
 
 
     if Playing == True and 0 <= z <= 8 and 0 <= w <= 8:
@@ -554,6 +556,23 @@ def Movement(square_selected,coords,piece_selected):
     board.move([square_selected[1], square_selected[0]], [coords[1], coords[0]])
     selected = UpdateBoardPieces(piece_selected, coords, square_selected, False)
     PiecesImagesUpdate()
+    
+    win = None
+    win = board.check_mate()
+    if win != None:
+        print(win[1])
+        if win[0] == "B":
+            write("Black Wins")
+            coords = win[1]
+            button = Buttons[coords[0]][coords[1]]
+            button.configure(bg="red")
+            
+            
+        if win[0] == "W":
+            coords = win[1]
+            button = Buttons[coords[0]][coords[1]]
+            button.configure(bg="red")
+            write("White Wins")
 
     return selected
 
