@@ -105,88 +105,95 @@ class Board(object):
             for y in range(0,8):
                 piece = (str(self.__board[x][y])).replace(" ","")
                 if piece == "wK" or piece == "bK":
-                    if (str(self.__board[x][y])).replace(" ","") == "wK":
-                        whiteKing = self.__board[x][y]
-                        WK_location = x,y
-                        
-                    if (str(self.__board[x][y])).replace(" ","") == "bK":
-                        blackKing = self.__board[x][y]
-                        BK_location = x,y
+                    if piece == "wK":
+                        self.wk_location = [x,y]
 
-        self.turn = "W"
+                    if piece == "bK":
+                        self.bk_location = [x,y]
+
+        self.turn = str("W")
         self.turn_count = 1
 
-        WK_Check = False
+        self.WK_Check = False
         for row in range(0,8):
             for column in range(0,8):
                 from_coords = [row,column]
                 piece = self.__board[row][column]
-                if piece is not None: 
+                if piece is not None:
                     if type(piece) is not King and piece.colour is not "w":
                         piece.get_legal_moves(from_coords, self.__board)
                         for move in piece.legal_moves:
-                            if move == WK_location:
-                                WK_Check = True
+                            if move == self.wk_location:
+                                self.WK_Check = True
 
-        BK_Check = False
+        self.BK_Check = False
         for row in range(0,8):
             for column in range(0,8):
                 from_coords = [row,column]
                 piece = self.__board[row][column]
-                if piece is not None: 
+                if piece is not None:
                     if type(piece) is not King and piece.colour is not "b":
                         piece.get_legal_moves(from_coords, self.__board)
                         for move in piece.legal_moves:
-                            if move == BK_location:
-                                BK_Check = True
+                            if move == self.bk_location:
+                                self.BK_Check = True
 
 
-        whiteKing = self.__board[WK_location[0]][WK_location[1]]
-        blackKing = self.__board[BK_location[0]][BK_location[1]]
-        
-        white_conditions = ((whiteKing.legal_moves != None) and (WK_Check != True))
-        black_conditions = ((blackKing.legal_moves != None) and (BK_Check != True))
 
-        while (white_conditions or black_conditions) == True:
-            self.turn_over == False
-            
-            while self.turn_over != True:
-                if self.turn_over == True:
-                    if self.turn == "W": #White Pieces
-                        print("white to black")
-                        self.turn = "B"
 
-                    if self.turn == "B": #Black Pieces
-                        print("black to white")
-                        self.turn = "W"
+    def Next_Turn(self):
+        for x in range(8):  # Update the King's location
+            for y in range(8):
+                if self.__board[x][y] is King:
+                    if self.__board[x][y].colour == "w":
+                        self.whiteKing = self.__board[x][y]
+                    if self.__board[x][y].colour == "b":
+                        self.blackKing = self.__board[x][y]
 
-                print(self.turn_count)
-                self.turn_count += 1
+    def check_mate(self):
+        white_coordinates = self.wk_location
+        black_coordinates = self.bk_location
 
-                for x in range(8):    #Update the King's location
-                    for y in range(8):
-                        if self.__board[x][y] is King:
-                            if self.__board[x][y].colour == "w":
-                                self.whiteKing = self.__board[x][y]
-                            if self.__board[x][y].colour == "b":
-                                self.blackKing = self.__board[x][y]
+        whiteKing = self.__board[white_coordinates[0]][white_coordinates[1]]
+        blackKing = self.__board[black_coordinates[0]][black_coordinates[1]]
 
-        if white_conditions == False:
+        self.white_conditions = ((whiteKing.legal_moves != None) and (self.WK_Check != True))
+        self.black_conditions = ((blackKing.legal_moves != None) and (self.BK_Check != True))
+
+        if self.white_conditions == False:
+            win = "B"
+            return win
             print("Black Wins")
-        if black_conditions == False:
+
+        if self.black_conditions == False:
+            win = "W"
+            return win
             print("White Wins")
-                                
-    
+
+
+    def turn_over(self):
+        if self.turn == "W":  # White Pieces
+            print("Black Now")
+            self.turn = "B"
+
+        elif self.turn == "B":  # Black Pieces
+            print("White now")
+            self.turn = "W"
+
+        else:
+            pass
+
+        print(self.turn_count)
+        self.turn_count += 1
+        self.turn_is_over = False
+
+
     def legalmoves(self,from_coords,board):
         #print(from_coords)
         piece = self.__board[from_coords[0]][from_coords[1]]
         return piece.get_legal_moves(from_coords,self.__board)
 
-    
-    
-    def turn_over():
-        self.turn_over = True
-    
+
     def boardshow(self):
         for row in self.__board:
             print(row)
@@ -194,7 +201,7 @@ class Board(object):
     def taken(self):
         return self.piecetaken
     
-    def turn(self):
+    def Wturn(self):
         return self.turn
     
     def turn_count(self):

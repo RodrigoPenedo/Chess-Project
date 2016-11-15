@@ -114,6 +114,7 @@ def Reset_Board(controller):
     SaveFirst()
     global selected, piece_selected
     selected = False
+    board.turn_reset()
     piece_selected = ""
     board.InitialPieceSetup()
     PiecesImagesUpdate()
@@ -276,6 +277,7 @@ def NewGame_Costumize(controller):
 def NewGame_Initialize_Start(controller,window):
     window.destroy()
     board.InitialPieceSetup()
+    board.Turns()
 
     global selected, square_selected, piece_selected
     selected = False
@@ -366,9 +368,6 @@ class NewGame(tk.Frame):
         for y in range(0, 8):
             Grid.rowconfigure(self, y, weight=1, minsize=70)
 
-        text = ttk.Label(self, text="Turn", font=20)
-        text.grid(column=10, row=0,columnspan=2)
-
         text = ttk.Label(self, text=" "*25)
         text.grid(column=8, row=0,rowspan=8, sticky=(N,S))
 
@@ -381,6 +380,12 @@ class NewGame(tk.Frame):
 
         button = ttk.Button(self, text = "Undo", command = lambda: UndoMove(self))
         button.grid(column=10, row=7,ipady=10,ipadx=10)
+
+
+    def update_turn(self):
+        turn = self.Wturn()
+        text = ttk.Label(self, text=turn, font=20)
+        text.grid(column=10, row=0,columnspan=2)
 
 
 class Load(tk.Frame):
@@ -456,7 +461,16 @@ def click(event):
 
     except KeyError:
         Playing = False
-        
+
+    win = None
+    board.check_mate()
+    if win != None:
+        if win == "B":
+            write("Black Wins")
+        if win == "W":
+            write("White Wins")
+
+
     if Playing == True and 0 <= z <= 8 and 0 <= w <= 8:
         if 0 <= z <= 8 and 0 <= w <= 8:
             if selected == True and (square_selected == coords):
@@ -473,10 +487,22 @@ def click(event):
                 try:
                     if board.board[w][z] is not None:
                         btn = Buttons[z][w]
-                        btn.configure(bg=colour_selected)
-                        selected = True
                         square_selected = z, w
                         piece_selected = board.board[w][z]
+                        if board.Wturn() == "W":
+                            if board.board[square_selected[1]][square_selected[0]].colour == "w":
+                                btn.configure(bg=colour_selected)
+                                selected = True
+
+                        if board.Wturn() == "B":
+                            if board.board[square_selected[1]][square_selected[0]].colour == "b":
+                                btn.configure(bg=colour_selected)
+                                selected = True
+
+                        if selected != True:
+                            square_selected = ""
+                            piece_selected = ""
+
 
                 except IndexError:
                     selected = False
@@ -488,6 +514,7 @@ def click(event):
                     try:
                         selected = Movement(square_selected,coords,piece_selected)
                         if selected == False:
+                            board.Next_Turn()
                             square_selected = ""
                             piece_selected = ""
 
@@ -506,7 +533,6 @@ def click(event):
                     moves = possiblemoves[i]
                     btn = Buttons[moves[1]][moves[0]]
                     btn.configure(bg=colour_possible_moves)
-
 
 
             elif selected == False:
@@ -579,6 +605,8 @@ def UpdateBoardPieces(piece_selected, coords, square_selected, Undo):
         data += str(Row[coords[0]]) + str(Column[coords[1]])
 
         write(data)
+
+        board.turn_over()
 
     try:
         return selected
