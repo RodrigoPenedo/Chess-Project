@@ -23,6 +23,17 @@ class Stack():
     def size(self):
         return len(self.items)
 
+def write(msg):
+    numlines = log.index('end - 1 line').split('.')[0]
+    log['state'] = 'normal'
+    if numlines==24:
+        log.delete(1.0, 2.0)
+    if log.index('end-1c')!='1.0':
+        log.insert('end', '\n')
+        log.see(END)
+    log.insert('end', msg)
+    log['state'] = 'disabled'
+
 
 global colour_selected, colour_possible_moves
 colour_selected = "orange"
@@ -128,7 +139,6 @@ def Colour_Picker_Both():
 def Info(parent):
     print("Soon")
 
-
 def UndoMove(event):
     try:
         coordinates = stack.pop()
@@ -144,9 +154,6 @@ def UndoMove(event):
 
     except IndexError:
         messagebox.showinfo(title="Failed", message="No more moves to Undo.")
-
-
-
 
 
 class StartMenu(tk.Frame):
@@ -185,10 +192,10 @@ class NewGame(tk.Frame):
 
         grid = Frame(self)
         grid.grid(sticky=N + S + E + W, column=0, row=7, columnspan=2)
-        Grid.rowconfigure(self, 7, weight=1, minsize=60)
-        Grid.columnconfigure(self, 0, weight=1, minsize=60)
+        Grid.rowconfigure(self, 7, weight=1, minsize=70)
+        Grid.columnconfigure(self, 0, weight=1, minsize=70)
 
-        global board, stack
+        global board, stack, log
         board = Board()
         stack = Stack()
 
@@ -257,10 +264,23 @@ class NewGame(tk.Frame):
                 Buttons[x].append(btn)
 
         for x in range(0, 8):
-            Grid.columnconfigure(self, x, weight=1, minsize=60)
+            Grid.columnconfigure(self, x, weight=1, minsize=70)
 
         for y in range(0, 8):
-            Grid.rowconfigure(self, y, weight=1, minsize=60)
+            Grid.rowconfigure(self, y, weight=1, minsize=70)
+
+        text = ttk.Label(self, text="Who's Turn", font=20)
+        text.grid(column=9, row=0,columnspan=2)
+
+        text = ttk.Label(self, text="")
+        text.grid(column=8, row=0,columnspan=8, sticky=(N,S))
+
+        log = Text(self, state='disabled',height=28, width=60, wrap="none")
+        log.grid(column=9, row=1, rowspan=6,sticky=(N,S,E,W))
+
+        s = ttk.Scrollbar(self, orient=VERTICAL, command=log.yview)
+        s.grid(column=15, row=1, sticky=(N, S),rowspan=6)
+        log['yscrollcommand'] = s.set
 
 
 class Load(tk.Frame):
@@ -303,9 +323,11 @@ def SaveFirst(controller):
     else:
         controller.show_frame(StartMenu)
 
+
 def LoadGame():
     filelocation = filedialog.askopenfilename()
     board.Load(board,filelocation)
+
 
 def Quit(game_played):
     if game_played == True:
@@ -362,13 +384,15 @@ def click(event):
 
 
     elif selected == True and Playing == True:
-        try:
-            Movement(square_selected,coords,piece_selected)
-            selected = False
-            square_selected = ""
-            piece_selected = ""
-        except AttributeError:
-            selected = True
+        if piece_selected != "":
+            try:
+                selected = Movement(square_selected,coords,piece_selected)
+                if selected == False:
+                    square_selected = ""
+                    piece_selected = ""
+
+            except AttributeError:
+                selected = True
 
     if selected == True and Playing == True:
         from_coords = [square_selected[1], square_selected[0]]
@@ -395,14 +419,17 @@ def click(event):
 
     #print(w, z)
 
+
 def Movement(square_selected,coords,piece_selected):
     board.move([square_selected[1], square_selected[0]], [coords[1], coords[0]])
-    UpdateBoardPieces(piece_selected, coords, square_selected, False)
+    selected = UpdateBoardPieces(piece_selected, coords, square_selected, False)
+
+    return selected
+
 
 def UpdateBoardPieces(piece_selected, coords, square_selected, Undo):
 
     btn = Buttons[coords[0]][coords[1]]
-    print(board.board[coords[1]][coords[0]])
     if piece_selected == board.board[coords[1]][coords[0]]:
 
         if str(board.board[coords[1]][coords[0]]).replace("  ", "") == "bB":
@@ -441,11 +468,24 @@ def UpdateBoardPieces(piece_selected, coords, square_selected, Undo):
             btn.configure(bg="black")
 
         btn.configure(image=Empty)
+        selected = False
 
-    if Undo == False:
+
+    if Undo == False and piece_selected == board.board[coords[1]][coords[0]]:
         item = [square_selected[1], square_selected[0]] + [coords[1], coords[0]] + [piece_selected]
         print(item)
         stack.push(item)
+
+        data = str(['Moved'] + [piece_selected] + [' from ('] +
+                   [square_selected[1]] + [square_selected[0]] + [') to ('] +
+                   [coords[1]] + [coords[0]] + [')'])
+        write(data)
+
+    try:
+        return selected
+    except UnboundLocalError:
+        selected = True
+        return selected
 
 
 def loadimages():
