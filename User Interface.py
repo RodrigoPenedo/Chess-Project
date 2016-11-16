@@ -65,8 +65,9 @@ class ChessApp(tk.Tk):
         square_selected = ""
         piece_selected = ""
 
-        global game_played
+        global game_played,game_over
         game_played = False
+        game_over = False
 
         menubar = tk.Menu(container)
         Game_menu = tk.Menu(menubar, tearoff=0)
@@ -311,7 +312,6 @@ class NewGame(tk.Frame):
         Buttons = []
         Colours = []
 
-
         # Import images for pieces
         # where
         # colour + PIECE + .gif = file name
@@ -324,13 +324,13 @@ class NewGame(tk.Frame):
             Colours.append([])
             for y in range(0, 8):
                 if Even:
-                    btn = tk.Button(self, bg="black", image=Empty)
-                    Colours[x].append("black")
+                    btn = tk.Button(self, bg="white", image=Empty)
+                    Colours[x].append("white")
                     Even = False
 
                 else:
-                    btn = tk.Button(self, bg="white", image=Empty)
-                    Colours[x].append("white")
+                    btn = tk.Button(self, bg="black", image=Empty)
+                    Colours[x].append("black")
                     Even = True
 
                 if board.board[y][x] is not None:
@@ -369,8 +369,18 @@ class NewGame(tk.Frame):
         for y in range(0, 8):
             Grid.rowconfigure(self, y, weight=1, minsize=70)
 
-        text = ttk.Label(self, text=" "*25)
-        text.grid(column=8, row=0,rowspan=8, sticky=(N,S))
+        global Turn_var
+        
+        Turn_var = StringVar()
+        Turn_var.set("It's high noon")
+        PlayerTurnLabel = tk.Label(self, textvariable=Turn_var ,font=30)
+        PlayerTurnLabel.grid(column=10, row=0, sticky=(N,S))
+        
+        gap = ttk.Label(self, text=" "*25)
+        gap.grid(column=9, row=0,rowspan=8, sticky=(N,S))
+
+        gap2 = ttk.Label(self, text=" "*20)
+        gap2.grid(column=16, row=1, rowspan=8, sticky=(N,S))
 
         log = Text(self, state='disabled',height=25, width=60, wrap="none",font=26)
         log.grid(column=10, row=1, rowspan=6,sticky=(N,S,E,W))
@@ -381,13 +391,6 @@ class NewGame(tk.Frame):
 
         button = ttk.Button(self, text = "Undo", command = lambda: UndoMove(self))
         button.grid(column=10, row=7,ipady=10,ipadx=10)
-
-
-    def update_turn(self):
-        turn = self.Wturn()
-        text = ttk.Label(self, text=turn, font=20)
-        text.grid(column=10, row=0,columnspan=2)
-
 
 class Load(tk.Frame):
 
@@ -448,9 +451,10 @@ def Quit(game_played):
 
 
 def click(event):
-    global selected, square_selected, piece_selected, Playing
+    global selected, square_selected, piece_selected, Playing, game_over
 
     try:
+        PiecesImagesUpdate()
         grid_info = event.widget.grid_info()
 
         z = grid_info["column"]
@@ -460,20 +464,11 @@ def click(event):
             coords = z,w
             Playing = True
 
-    except KeyError:
+    except KeyError or AttributeError:
         Playing = False
 
-    a = """
-    win = None
-    win = board.check_mate()
-    if win != None:
-        if win == "B":
-            write("Black Wins")
-        if win == "W":
-            write("White Wins")"""
 
-
-    if Playing == True and 0 <= z <= 8 and 0 <= w <= 8:
+    if Playing == True and 0 <= z <= 8 and 0 <= w <= 8 and game_over == False:
         if 0 <= z <= 8 and 0 <= w <= 8:
             if selected == True and (square_selected == coords):
                 try:
@@ -519,7 +514,8 @@ def click(event):
                             board.Next_Turn()
                             square_selected = ""
                             piece_selected = ""
-
+                        PiecesImagesUpdate()
+                        
                     except AttributeError:
                         selected = True
 
@@ -549,31 +545,32 @@ def click(event):
                         if colour == "black":
                             btn.configure(bg="black")
 
-            #print(w, z)
+
+        win = board.check_mate()
+        if win != None:
+            if win[0] == "B":
+                write("Black Wins")
+                coords = win[1]
+                button = Buttons[coords[1]][coords[0]]
+                button.configure(bg="red")
+                game_over = True
+
+            if win[0] == "W":
+                write("White Wins")
+                coords = win[1]
+                button = Buttons[coords[1]][coords[0]]
+                button.configure(bg="red")
+                game_over = True
+
+                #print(w, z)
 
 
 def Movement(square_selected,coords,piece_selected):
+    PiecesImagesUpdate()
     board.move([square_selected[1], square_selected[0]], [coords[1], coords[0]])
     selected = UpdateBoardPieces(piece_selected, coords, square_selected, False)
     PiecesImagesUpdate()
     
-    win = None
-    win = board.check_mate()
-    if win != None:
-        print(win[1])
-        if win[0] == "B":
-            write("Black Wins")
-            coords = win[1]
-            button = Buttons[coords[0]][coords[1]]
-            button.configure(bg="red")
-            
-            
-        if win[0] == "W":
-            coords = win[1]
-            button = Buttons[coords[0]][coords[1]]
-            button.configure(bg="red")
-            write("White Wins")
-
     return selected
 
 
@@ -677,6 +674,12 @@ def PiecesImagesUpdate():
             if board.board[j][i] is None:
                 btn = Buttons[i][j]
                 btn.configure(image=Empty)
+    
+    turn = board.Wturn()
+    if turn == "W":
+        Turn_var.set("White's turn")
+    if turn == "B":
+        Turn_var.set("Black's turn")
 
 
 def loadimages():

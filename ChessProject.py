@@ -207,6 +207,7 @@ class Board(object):
     def turn_undo(self):
         if self.turn == "W":
             self.turn = "B"
+            
         if self.turn == "B":
             self.turn = "W"
 
